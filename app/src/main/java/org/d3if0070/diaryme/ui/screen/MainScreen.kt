@@ -30,6 +30,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -90,6 +91,7 @@ import org.d3if0070.diaryme.network.ApiStatus
 import org.d3if0070.diaryme.network.ImageApi
 import org.d3if0070.diaryme.network.UserDataStore
 import org.d3if0070.diaryme.ui.theme.DiaryMeTheme
+import org.d3if0070.diaryme.ui.theme.TextColor
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -138,10 +140,7 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier, 
                     }
                 }
             }
-
         }
-
-
         ApiStatus.FAILED -> {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -152,9 +151,10 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier, 
                 Button(
                     onClick = { viewModel.retrieveData(userId) },
                     modifier = Modifier.padding(top = 16.dp),
-                    contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
+                    contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = TextColor)
                 ) {
-                    Text(text = stringResource(id = R.string.try_again))
+                    Text(text = stringResource(id = R.string.try_again),)
                 }
             }
         }
@@ -207,8 +207,8 @@ fun MainScreen() {
                         }) {
                         Icon(
                             painter = painterResource(
-                                if (showList) R.drawable.baseline_grid_view_24
-                                else R.drawable.baseline_view_list_24,
+                                if (showList) R.drawable.grid_view
+                                else R.drawable.view_list,
 
                                 ),
                             contentDescription = if (showList) "Grid"
@@ -235,7 +235,7 @@ fun MainScreen() {
             FloatingActionButton(onClick = {
                 val options = CropImageContractOptions(
                     null, CropImageOptions(
-                        imageSourceIncludeGallery = false,
+                        imageSourceIncludeGallery = true,
                         imageSourceIncludeCamera = true,
                         fixAspectRatio = true
                     )
@@ -244,7 +244,8 @@ fun MainScreen() {
             }) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(id = R.string.tambah_hewan)
+                    contentDescription = stringResource(id = R.string.tambah_postingan),
+                    tint = TextColor
                 )
             }
         }
