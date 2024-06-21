@@ -87,11 +87,12 @@ import org.d3if0070.diaryme.BuildConfig
 import org.d3if0070.diaryme.R
 import org.d3if0070.diaryme.model.Post
 import org.d3if0070.diaryme.model.User
+import org.d3if0070.diaryme.network.Api
 import org.d3if0070.diaryme.network.ApiStatus
-import org.d3if0070.diaryme.network.ImageApi
 import org.d3if0070.diaryme.network.UserDataStore
 import org.d3if0070.diaryme.ui.theme.DiaryMeTheme
 import org.d3if0070.diaryme.ui.theme.TextColor
+import org.d3if0070.diaryme.ui.theme.backgorundTopBar
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -99,7 +100,7 @@ import java.time.format.DateTimeFormatter
 fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier, showList: Boolean) {
     val data by viewModel.data
     val status by viewModel.status.collectAsState()
-    var showHapusDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
     var postData by remember { mutableStateOf<Post?>(null) }
 
     LaunchedEffect(userId) {
@@ -123,7 +124,7 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier, 
                     contentPadding = PaddingValues(bottom = 84.dp)
                 ) {
                     items(data) {
-                        ListItem(it, viewModel, userId, showHapusDialog)
+                        ListItem(it, viewModel, userId, showDeleteDialog)
                         Divider()
                     }
                 }
@@ -136,7 +137,7 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier, 
                     contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
                     items(data) {
-                        GridItem(it, viewModel, userId, showHapusDialog)
+                        GridItem(it, viewModel, userId, showDeleteDialog)
                     }
                 }
             }
@@ -154,7 +155,7 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier, 
                     contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = TextColor)
                 ) {
-                    Text(text = stringResource(id = R.string.try_again),)
+                    Text(text = stringResource(id = R.string.try_again))
                 }
             }
         }
@@ -195,8 +196,8 @@ fun MainScreen() {
                     Text(text = stringResource(id = R.string.app_name))
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary
+                    containerColor = backgorundTopBar,
+                    titleContentColor = TextColor
                 ),
                 actions = {
                     IconButton(
@@ -209,10 +210,10 @@ fun MainScreen() {
                             painter = painterResource(
                                 if (showList) R.drawable.grid_view
                                 else R.drawable.view_list,
-
                                 ),
                             contentDescription = if (showList) "Grid"
-                                else "List"
+                                else "List",
+                            tint = TextColor
                         )
                     }
                     IconButton(onClick = {
@@ -225,7 +226,7 @@ fun MainScreen() {
                         Icon(
                             painter = painterResource(R.drawable.account_circle),
                             contentDescription = stringResource(R.string.profil),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = TextColor
                         )
                     }
                 }
@@ -295,7 +296,7 @@ fun GridItem(data: Post, viewModel: MainViewModel, userId: String, showHapus: Bo
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(ImageApi.getImageUrl(data.image_id))
+                .data(Api.getImageUrl(data.image_id))
                 .crossfade(true)
                 .build(),
             contentDescription = stringResource(
@@ -339,7 +340,7 @@ fun GridItem(data: Post, viewModel: MainViewModel, userId: String, showHapus: Bo
                             DeleteDialog(
                                 onDismissRequest = { showDialogDelete = false },
                             ) {
-                                viewModel.deleteData(userId, data.post_id, data.delete_hash)
+                                viewModel.deleteData(userId, data.post_id)
                                 showDialogDelete = false
                             }
                         }
@@ -361,7 +362,7 @@ fun ListItem(post: Post, viewModel: MainViewModel, userId: String, showHapus: Bo
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(ImageApi.getImageUrl(post.image_id))
+                .data(Api.getImageUrl(post.image_id))
                 .crossfade(true)
                 .build(),
             contentDescription = stringResource(R.string.gambar, post.description),
@@ -402,7 +403,7 @@ fun ListItem(post: Post, viewModel: MainViewModel, userId: String, showHapus: Bo
                             DeleteDialog(
                                 onDismissRequest = { showDialogDelete = false },
                             ) {
-                                viewModel.deleteData(userId, post.post_id, post.delete_hash)
+                                viewModel.deleteData(userId, post.post_id)
                                 showDialogDelete = false
                             }
                         }
